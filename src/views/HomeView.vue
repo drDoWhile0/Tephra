@@ -1,7 +1,6 @@
 <template>
   <div class="flex flex-col h-full">
-    <!-- Map takes upper portion -->
-    <div class="h-[70%] w-full">
+    <div class="h-[55%] w-full shrink-0">
       <MapView
         v-if="!store.loading && store.events.length > 0"
         :events="store.filteredEvents"
@@ -11,6 +10,10 @@
         {{ store.loading ? 'Loading events...' : store.error }}
       </div>
     </div>
+
+    <div class="flex-1 min-h-0">
+      <ActivityPanel />
+    </div>
   </div>
 </template>
 
@@ -18,9 +21,9 @@
 import { onMounted } from 'vue'
 import { useVolcanoStore } from '../stores/useVolcanoStore'
 import MapView from '../components/map/MapView.vue'
+import ActivityPanel from '../components/map/ActivityPanel.vue'
 
 const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN
-
 const store = useVolcanoStore()
 
 onMounted(() => {
