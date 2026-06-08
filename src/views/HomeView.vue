@@ -1,21 +1,29 @@
 <template>
-  <div class="p-8">
-    <div v-if="loading" class="text-text-muted text-sm">Loading...</div>
-    <div v-else-if="error" class="text-danger text-sm">{{ error }}</div>
-    <div v-else class="text-text-muted text-sm">
-      {{ events.length }} events loaded
+  <div class="flex flex-col h-full">
+    <!-- Map takes upper portion -->
+    <div class="h-[70%] w-full">
+      <MapView
+        v-if="!store.loading && store.events.length > 0"
+        :events="store.filteredEvents"
+        :mapbox-token="MAPBOX_TOKEN"
+      />
+      <div v-else class="w-full h-full flex items-center justify-center text-text-muted text-sm">
+        {{ store.loading ? 'Loading events...' : store.error }}
+      </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { onMounted } from 'vue'
-import { useUSGS } from '../composables/useUSGS'
+import { useVolcanoStore } from '../stores/useVolcanoStore'
+import MapView from '../components/map/MapView.vue'
 
-const { events, loading, error, fetchEvents } = useUSGS()
+const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN
 
-// Vue equivalent of useEffect(() => { fetchEvents() }, [])
+const store = useVolcanoStore()
+
 onMounted(() => {
-  fetchEvents()
+  store.fetchEvents()
 })
 </script>

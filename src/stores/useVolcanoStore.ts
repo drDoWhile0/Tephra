@@ -1,33 +1,49 @@
-import { defineStore } from 'pinia';
+import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
+import { useUSGS, type VolcanoEvent } from '../composables/useUSGS'
 
 export const useVolcanoStore = defineStore('volcano', () => {
-    // State
-    const events = ref<any[]>([])
-    const loading = ref(false)
-    const error = ref<string | null>(null)
+  const { events, loading, error, fetchEvents } = useUSGS()
 
-    // Getters (computed = useMemo in react)
-    const recentEvents = computed(() =>
-        events.value.slice(0, 20)
-    )
+  const filters = ref({
+    minMagnitude: 0,
+    searchQuery: '',
+  })
 
-    // Actions
-    async function fetchEvents () {
-        loading.value = true
-        error.value = null
-        try {
-            const res = await fetch(
-                'https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&eventtype=volcanic%20eruption&orderby=time&limit=100&starttime=2026-01-01'
-            )
-            const data = await res.json()
-            events.value = data.features
-        } catch (e) {
-            error.value = 'Failed to fetch volcanic and seismic events'
-        } finally {
-            loading.value = false
-        }
-    }
+  const filteredEvents = computed(() => {
+    return events.value.filter(e => {
+      const matchesMag = e.magnitude >= filters.value.minMagnitude
+      const matchesSearch = e.place
+        .toLowerCase()
+        .includes(filters.value.searchQuery.toLowerCase())
+      return matchesMag && matchesSearch
+    })
+  })
 
-    return { events, loading, error, recentEvents, fetchEvents }
+  const eventsByMagnitude = computed(() => ({
+    minor: filteredEvents.value.filter(e => e.magnitude < 2.5).length,
+    light: filteredEvents.value.filter(e => e.magnitude >= 2.5 && e.magnitude < 4).length,
+    moderate: filteredEvents.value.filter(e => e.magnitude >= 4 && e.magnitude < 6).length,
+    significant: filteredEvents.value.filter(e => e.magnitude >= 6).length,
+  }))
+
+  function setFilter(key: keyof typeof filters.value, value: any) {
+    filters.value[key] = value
+  }
+
+  function clearFilters() {
+    filters.value = { minMagnitude: 0, searchQuery: '' }
+  }
+
+  return {
+    events,
+    loading,
+    error,
+    filters,
+    filteredEvents,
+    eventsByMagnitude,
+    fetchEvents,
+    setFilter,
+    clearFilters,
+  }
 })
