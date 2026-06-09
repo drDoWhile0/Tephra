@@ -1,4 +1,4 @@
-import { ref, onMounted } from 'vue'
+import { ref, onUnmounted } from 'vue'
 import mapboxgl from 'mapbox-gl'
 import type { VolcanoEvent } from './useUSGS'
 
@@ -23,14 +23,24 @@ export function useMapbox(token: string) {
             center: [0, 20],
         })
 
-        (map.value as any).on('style.load', () => {
-            // Atmosphere effect on the globe
+        map.value.on('style.load', () => {
             map.value!.setFog({
                 color: 'rgb(20, 20, 32)',
                 'high-color': 'rgb(40, 40, 80)',
                 'horizon-blend': 0.02,
                 'space-color': 'rgb(13, 13, 20)',
                 'star-intensity': 0.6,
+            })
+
+            // v3 stars are a sky layer
+            map.value!.addLayer({
+                id: 'sky',
+                type: 'sky',
+                paint: {
+                'sky-type': 'atmosphere',
+                'sky-atmosphere-sun': [0.0, 90.0],
+                'sky-atmosphere-sun-intensity': 15,
+                }
             })
         })
     }
@@ -70,11 +80,11 @@ export function useMapbox(token: string) {
                     </div>
                 `)
                 )
-                .addTo(map.value as any)
+                .addTo(map.value!)
         })
     }
 
-    onMounted(() => {
+    onUnmounted(() => {
         map.value?.remove()
     })
 
