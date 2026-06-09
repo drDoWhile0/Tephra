@@ -23,7 +23,7 @@ export function useMapbox(token: string) {
             center: [0, 20],
         })
 
-        map.value.on('style.load', () => {
+        (map.value as any).on('style.load', () => {
             // Atmosphere effect on the globe
             map.value!.setFog({
                 color: 'rgb(20, 20, 32)',
@@ -70,7 +70,7 @@ export function useMapbox(token: string) {
                     </div>
                 `)
                 )
-                .addTo(map.value!)
+                .addTo(map.value as any)
         })
     }
 

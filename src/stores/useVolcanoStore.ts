@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import { useUSGS, type VolcanoEvent } from '../composables/useUSGS'
+import { useUSGS } from '../composables/useUSGS'
 
 export const useVolcanoStore = defineStore('volcano', () => {
   const { events, loading, error, fetchEvents } = useUSGS()
@@ -27,7 +27,7 @@ export const useVolcanoStore = defineStore('volcano', () => {
     significant: filteredEvents.value.filter(e => e.magnitude >= 6).length,
   }))
 
-  function setFilter(key: keyof typeof filters.value, value: any) {
+  function setFilter<K extends keyof typeof filters.value>(key: K, value: typeof filters.value[K]) {
     filters.value[key] = value
   }
 
