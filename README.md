@@ -4,6 +4,12 @@ A professional volcanic and seismic activity monitoring dashboard built for real
 
 ---
 
+## Live Demo
+
+[https://tephr.netlify.app](https://tephr.netlify.app)
+
+---
+
 ## Features
 
 - **Interactive 3D Globe** — Mapbox GL globe projection with atmospheric fog and star field. Seismic events plotted as color-coded markers scaled by magnitude, with popup detail on click.
